@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- status记录到控制台的内部Log4j事件的级别，可缺省 -->
+<!-- monitorInterval设置检查文件更改间隔时间，单位S，每秒检查一次 -->
+<configuration status="WARN" monitorInterval="1">
+
+    <!--日志打印级别: fatal > error > warn > info > debug > trace -->
+
+    <!-- 全局变量，通过${name}引用该变量 -->
+    <Properties>
+        <!-- 日志打印路径 -->
+        <Property name="LOG_HOME">../logs/fc-asset</Property>
+        <!-- 历史日志打印路径 -->
+        <Property name="HISTORY_LOG_HOME">${LOG_HOME}/history</Property>
+        <!-- 统一日志打印格式：2020-07-01 21:14:48, 987 [main] [INFO] [com.fc.asset.FcAssetApplication] [FcAssetApplication.java:15] - message -->
+        <Property name="LOG_PATTERN"
+                  value="%date{yyyy-MM-dd HH:mm:ss, SSS} [%thread] [%-5level] [%logger{36}] [%file:%line] - %msg%n"/>
+    </Properties>
+
+    <!-- 负责将日志传送至配置目的地，配置日志打印内容、格式、方式、保存策略等 -->
+    <Appenders>
+        <!-- 控制台日志打印配置 -->
+        <console name="Console" target="SYSTEM_OUT">
+            <!-- 打印格式 -->
+            <PatternLayout charset="UTF-8" pattern="${LOG_PATTERN}"/>
+        </console>
+
+        <!-- 文件打印配置，支持文件滚动归档和缓存；filePattern设置滚动单位为S，%i代表从1开始的正整数，%3i可为3位 -->
+        <RollingRandomAccessFile name="normalLog" fileName="${LOG_HOME}/fc-asset.log"
+                                 filePattern="${HISTORY_LOG_HOME}/fc-asset_%d{yyyy-MM-dd HH:mm:ss}_%i.log">
+            <!-- 打印格式 -->
+            <PatternLayout charset="UTF-8" pattern="${LOG_PATTERN}"/>
+            <!-- 滚动策略 -->
+            <Policies>
+                <!-- 文件每超过1KB就生成一个新的日志文件 -->
+                <SizeBasedTriggeringPolicy size="1KB"/>
+                <!-- 每2秒生成一个新的日志文件，并修正时间 -->
+                <TimeBasedTriggeringPolicy interval="2" modulate="true"/>
+            </Policies>
+            <!-- 同一秒的日志文件最多只能拆分两个 -->
+            <DefaultRolloverStrategy max="2"/>
+        </RollingRandomAccessFile>
+    </Appenders>
+
+    <!-- 日志打印配置，只有此处配置了Appender，Appender才会生效 -->
+    <Loggers>
+        <!-- 只打印包含com.fc.asset内容的日志，打印级别为trace，并将其反馈至Root中 -->
+        <Logger name="com.fc.asset" level="trace" additivity="true">
+            <AppenderRef ref="normalLog"/>
+        </Logger>
+        <!-- Root设置打印级别为info，打印控制台 -->
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</configuration>
