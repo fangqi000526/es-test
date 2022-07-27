@@ -6,6 +6,14 @@ package com.fangqi.test.pojo;
  */
 public class User {
 
+    static {
+        System.out.println("static");
+    }
+    {
+        System.out.println("代码块");
+        System.out.println(this);
+    }
+
     /**
      * 姓名
      */
@@ -45,7 +53,17 @@ public class User {
         return age;
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", gender='" + gender + '\'' +
+                ", age=" + age +
+                '}';
+    }
+
     public User() {
+        System.out.println("无参构造");
     }
 
     public User(String name, String gender, Integer age) {
